@@ -1,10 +1,10 @@
 # FLUTTER TODO APP
 
 ## Features
-Persistent Storage.
-Theme toggling.
-Nice and smooth UI.
-Best coding practices.
+- Persistent Storage.
+- Theme toggling.
+- Nice and smooth UI.
+- Best coding practices.
 
 ## Getting Started
 
