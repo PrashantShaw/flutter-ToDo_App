@@ -1,36 +1,34 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:provider/provider.dart';
 import 'package:todo_app/pages/home_page.dart';
-import 'package:todo_app/theme/theme_provider.dart';
+import 'package:todo_app/providers/theme_provider.dart';
+import 'package:todo_app/utils/constants.dart';
 
 main() async {
   await Hive.initFlutter();
-  await Hive.openBox("todoBox");
+  await Hive.openBox(Constants.todoHiveName);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    ProviderScope(
       child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ThemeData themeData = ref.watch(themeDataProvider).themeData;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      // theme: context.read<ThemeProvider>().themeData,
-      theme: Provider.of<ThemeProvider>(context).themeData,
-      // darkTheme: darkTheme,
+      theme: themeData,
       home: HomePage(),
     );
   }

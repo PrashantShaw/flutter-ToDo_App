@@ -1,18 +1,22 @@
 import 'package:hive/hive.dart';
+import 'package:todo_app/models/todo_model.dart';
+import 'package:todo_app/utils/constants.dart';
+import 'package:uuid/uuid.dart';
+
+const uuid = Uuid();
 
 class TodoDatabase {
-  List todoList = [];
+  List<TodoModel> todoList = [];
 
   void createInitialData() {
-    todoList = [
-      {'task': 'Wash the Cow', 'isComplete': false},
-      {'task': 'Learn flutter', 'isComplete': true},
-    ];
+    todoList = sampleTodoData;
   }
 
-  void loadTodoList() {
-    Box box = Hive.box("todoBox");
-    List? todos = box.get("TODO_DATABASE");
+  void loadTodoList() async {
+    Box box = Hive.box(Constants.todoHiveName);
+    // box.clear();
+    List<TodoModel>? todos = await box.get(Constants.hiveTodoDb);
+    print('&&&&&&&&&&&&&&&&&&&&&&&&& $todos');
 
     if (todos == null) {
       createInitialData();
@@ -21,7 +25,8 @@ class TodoDatabase {
     }
   }
 
-  void updateTodoList() {
-    Hive.box("todoBox").put("TODO_DATABASE", todoList);
+  void updateTodoList(updatedList) {
+    todoList = updatedList;
+    Hive.box(Constants.todoHiveName).put(Constants.hiveTodoDb, todoList);
   }
 }

@@ -37,9 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider:
   flutter_slidable: ^3.0.1
-  # hive dependencies
   hive:
   hive_flutter:
+  flutter_riverpod: ^2.4.10
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,8 @@ dev_dependencies:
   # hive dev_dependiencies
   hive_generator:
   build_runner:
+  custom_lint:
+  riverpod_lint: ^2.3.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

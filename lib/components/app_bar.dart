@@ -1,12 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todo_app/theme/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_app/providers/theme_provider.dart';
 
-AppBar homeAppBar(ColorScheme colorScheme, BuildContext context) {
+AppBar homeAppBar() {
   return AppBar(
-    // backgroundColor: colorScheme.tertiary,
     bottomOpacity: 0.1,
     leading: IconButton(
       onPressed: () {},
@@ -21,12 +20,17 @@ AppBar homeAppBar(ColorScheme colorScheme, BuildContext context) {
       ),
     ),
     actions: [
-      IconButton(
-          onPressed: () {
-            var themeProvider = context.read<ThemeProvider>();
-            themeProvider.toggleThemeData();
-          },
-          icon: Icon(Icons.light_mode))
+      Consumer(
+        builder: (context, ref, child) {
+          return IconButton(
+            onPressed: () {
+              var appTheme = ref.watch(themeDataProvider);
+              appTheme.toggleThemeData();
+            },
+            icon: Icon(Icons.light_mode),
+          );
+        },
+      )
     ],
   );
 }

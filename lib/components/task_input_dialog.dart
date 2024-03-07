@@ -5,10 +5,10 @@ import 'package:todo_app/components/action_button.dart';
 
 class TaskInputDialog extends StatelessWidget {
   final TextEditingController taskInputController;
-  VoidCallback saveNewTask;
-  VoidCallback onCancel;
+  final VoidCallback saveNewTask;
+  final VoidCallback onCancel;
 
-  TaskInputDialog({
+  const TaskInputDialog({
     super.key,
     required this.taskInputController,
     required this.saveNewTask,

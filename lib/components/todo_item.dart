@@ -7,15 +7,15 @@ class TodoItem extends StatelessWidget {
   final ColorScheme colorScheme;
   final String task;
   final bool isComplete;
-  void Function(bool?)? onChanged;
-  void Function(BuildContext) onDelete;
+  final void Function(bool?)? onStatusChanged;
+  final void Function(BuildContext) onDelete;
 
   TodoItem({
     super.key,
     required this.colorScheme,
     required this.task,
     required this.isComplete,
-    required this.onChanged,
+    required this.onStatusChanged,
     required this.onDelete,
   });
 
@@ -47,7 +47,7 @@ class TodoItem extends StatelessWidget {
             children: [
               Checkbox(
                 value: isComplete,
-                onChanged: onChanged,
+                onChanged: onStatusChanged,
                 activeColor: Colors.green,
               ),
               Text(
