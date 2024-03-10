@@ -3,12 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:todo_app/apis/hive_adapter.dart';
 import 'package:todo_app/pages/home_page.dart';
 import 'package:todo_app/providers/theme_provider.dart';
 import 'package:todo_app/utils/constants.dart';
 
 main() async {
   await Hive.initFlutter();
+  Hive.registerAdapter(TodoModelAdapter());
   await Hive.openBox(Constants.todoHiveName);
 
   runApp(

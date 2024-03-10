@@ -16,46 +16,6 @@ class HomePage extends ConsumerWidget {
 
   final TextEditingController taskInputController = TextEditingController();
 
-  // TodoDatabase localDB = TodoDatabase();
-
-  // @override
-  // void initState() {
-  //   localDB.loadTodoList();
-  //   super.initState();
-  // }
-
-  // void changeIsComplete(bool? state, int idx) {
-  //   setState(() {
-  //     var todoItem = localDB.todoList[idx];
-  //     bool prevState = todoItem['isComplete'];
-  //     todoItem['isComplete'] = !prevState;
-  //   });
-  //   localDB.updateTodoList();
-  // }
-
-  // void saveNewTask() {
-  //   String task = taskInputController.text;
-
-  //   if (task == '') return;
-
-  //   Map newTask = {'task': task, 'isComplete': false};
-
-  //   setState(() {
-  //     localDB.todoList.add(newTask);
-  //   });
-  //   localDB.updateTodoList();
-
-  //   Navigator.of(context).pop();
-  //   taskInputController.clear();
-  // }
-
-  // void onTaskDelete(BuildContext buildCtx, int index) {
-  //   setState(() {
-  //     localDB.todoList.removeAt(index);
-  //   });
-  //   localDB.updateTodoList();
-  // }
-
   void saveNewTask(BuildContext context, Function addTask) {
     addTask(taskInputController.text);
     closeInputDialog(context);
@@ -87,31 +47,53 @@ class HomePage extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final TodoList todoListActions = ref.read(todoListProvider.notifier);
-    final List<TodoModel> todoList = ref.watch(todoListProvider);
+    final AsyncValue<List<TodoModel>> asyncTodoList =
+        ref.watch(todoListProvider);
 
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: homeAppBar(),
-      body: ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          TodoModel todoItem = todoList[index];
-          return TodoItem(
-            colorScheme: colorScheme,
-            task: todoItem.task,
-            isComplete: todoItem.isComplete,
-            onStatusChanged: (state) =>
-                todoListActions.toggleStatus(todoItem.id),
-            onDelete: (ctx) => todoListActions.removeTodo(todoItem.id),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showTaskInputDialog(context, todoListActions.addTodo),
-        tooltip: "Add ToDo",
-        foregroundColor: colorScheme.tertiary,
-        child: Icon(Icons.add),
-      ),
+      body: widgetToRender(asyncTodoList, todoListActions),
+      floatingActionButton: addTodoFloatingBtn(context, todoListActions),
+    );
+  }
+
+  Widget widgetToRender(
+      AsyncValue<List<TodoModel>> asyncTodoList, TodoList todoListActions) {
+    Widget toRender = asyncTodoList.when(
+      data: (todoList) => todoListWrapper(todoList, todoListActions),
+      error: (error, stack) =>
+          Text('Oops, something unexpected happened $error'),
+      loading: () => CircularProgressIndicator(),
+    );
+
+    return toRender;
+  }
+
+  FloatingActionButton addTodoFloatingBtn(
+      BuildContext context, TodoList todoListActions) {
+    return FloatingActionButton(
+      onPressed: () => showTaskInputDialog(context, todoListActions.addTodo),
+      tooltip: "Add ToDo",
+      foregroundColor: Theme.of(context).colorScheme.tertiary,
+      child: Icon(Icons.add),
+    );
+  }
+
+  ListView todoListWrapper(List<TodoModel> todoList, TodoList todoListActions) {
+    return ListView.builder(
+      itemCount: todoList.length,
+      itemBuilder: (context, index) {
+        TodoModel todoItem = todoList[index];
+        return TodoItem(
+          colorScheme: Theme.of(context).colorScheme,
+          task: todoItem.task,
+          isComplete: todoItem.isComplete,
+          onStatusChanged: (state) =>
+              todoListActions.toggleTodoState(todoItem.id),
+          onDelete: (ctx) => todoListActions.removeTodo(todoItem.id),
+        );
+      },
     );
   }
 }

@@ -1,49 +1,44 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_app/apis/todos_api.dart';
 import 'package:todo_app/models/todo_model.dart';
-import 'package:todo_app/utils/constants.dart';
-import 'package:todo_app/utils/local_db.dart';
-import 'package:uuid/uuid.dart';
 
-const uuid = Uuid();
-
-class TodoList extends Notifier<List<TodoModel>> {
-  // static final TodoDatabase _hiveDB = TodoDatabase();
+class TodoList extends AsyncNotifier<List<TodoModel>> {
   @override
-  List<TodoModel> build() {
-    // _hiveDB.loadTodoList();
-    // final initialData = _hiveDB.todoList;
-    // print('INitail Data:: $initialData');
-    // return initialData;
-    return sampleTodoData;
+  Future<List<TodoModel>> build() async {
+    List<TodoModel> todos = await TodosApi.fetchTodos();
+    return todos;
   }
 
-  void addTodo(String task) {
-    if (task == '') return;
-
-    TodoModel newTodo = TodoModel(id: uuid.v4(), task: task);
-    List<TodoModel> updatedList = [...state, newTodo];
-    // _hiveDB.updateTodoList(updatedList);
-    state = updatedList;
+  Future<void> addTodo(String task) async {
+    try {
+      state = const AsyncValue.loading();
+      List<TodoModel> todos = await TodosApi.addTodo(task);
+      state = AsyncValue.data(todos);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 
-  void removeTodo(String id) {
-    List<TodoModel> updatedList = state.where((todo) => todo.id != id).toList();
-    // _hiveDB.updateTodoList(updatedList);
-    state = updatedList;
+  Future<void> toggleTodoState(String id) async {
+    try {
+      state = const AsyncValue.loading();
+      List<TodoModel> todos = await TodosApi.toggleStatus(id);
+      state = AsyncValue.data(todos);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 
-  void toggleStatus(String id) {
-    List<TodoModel> updatedList = state
-        .map((todo) => todo.id == id
-            ? TodoModel(
-                id: todo.id, task: todo.task, isComplete: !todo.isComplete)
-            : todo)
-        .toList();
-
-    // _hiveDB.updateTodoList(updatedList);
-    state = updatedList;
+  Future<void> removeTodo(String id) async {
+    try {
+      state = const AsyncValue.loading();
+      List<TodoModel> todos = await TodosApi.removeTodo(id);
+      state = AsyncValue.data(todos);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 }
 
 final todoListProvider =
-    NotifierProvider<TodoList, List<TodoModel>>(() => TodoList());
+    AsyncNotifierProvider<TodoList, List<TodoModel>>(() => TodoList());
